@@ -35,19 +35,17 @@ const Content = (props) => {
       }
       const jsonData = [
         ...dataset,
-        { result: inputData, id: inputData.toString(), isCompleted: false },
+        {
+          result: inputData,
+          id: inputData.toString() + Math.floor(Math.random() * 10000),
+          isCompleted: false,
+        },
       ];
       const { data, dataLink } = await props.mySky.setJSON(
         props.filePath,
         jsonData
       );
       setSubmittedData(data);
-
-      // await props.contentRecord.recordInteraction({
-      //   skylink: dataLink,
-      //   metadata: { action: "updatedTodoList" },
-      // });
-
       console.log("data submitted");
     } catch (error) {
       console.log("Submit Error: ", error.message);
@@ -91,12 +89,31 @@ const Content = (props) => {
     }
   };
 
+  const handleReset = async () => {
+    try {
+      const newData = [];
+      const { data, dataLink } = await props.mySky.setJSON(
+        props.filePath,
+        newData
+      );
+      setSubmittedData(data);
+      console.log("data reset");
+    } catch (err) {
+      console.log("Reset Error: ", err.message);
+    }
+  };
+
   return (
     <div className="flex flex-col p-10 min-h-screen">
       {props.loggedIn !== null && !props.loggedIn && (
         <h1 className="text-center text-3xl">
           Please Login or Signup First !!!
         </h1>
+      )}
+      {props.loggedIn !== null && props.loggedIn && (
+        <div className="flex justify-center p-5 text-xl">
+          <p>{`User ID: ${props.userID}`}</p>
+        </div>
       )}
       {props.loggedIn !== null && props.loggedIn && (
         <div className="flex justify-center items-center">
@@ -124,12 +141,22 @@ const Content = (props) => {
           </div>
         </div>
       )}
-      {props.loggedIn != null && props.loggedIn && (
+      {props.loggedIn !== null && props.loggedIn && (
         <Detail
           dataset={dataset}
           handleDelete={handleDelete}
           handleComplete={handleComplete}
         />
+      )}
+      {props.logged !== null && props.loggedIn && dataset.length !== 0 && (
+        <div className="flex justify-center">
+          <button
+            onClick={handleReset}
+            className="py-2 w-1/5 bg-blue-200 rounded-full text-3xl hover:bg-blue-300"
+          >
+            Clear All
+          </button>
+        </div>
       )}
     </div>
   );
